@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Aggregate } from 'mongoose';
 import slugify from 'slugify';
 
 const tourSchema = new mongoose.Schema(
@@ -81,6 +81,12 @@ tourSchema.pre('save', function (next) {
 
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre('aggregate', function (next) {
+  const thisTyped: Aggregate<any> = this as any;
+  thisTyped.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   next();
 });
 
