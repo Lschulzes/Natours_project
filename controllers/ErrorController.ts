@@ -1,6 +1,12 @@
 import { ErrorRequestHandler, NextFunction, Response } from 'express';
+import { Error } from 'mongoose';
 import { RequestCustom } from '../custom_types';
 import { AppError } from './../resources/helpers';
+
+const handleCastErrorDB = (err: Error.CastError): AppError => {
+  const message = `Invalid ${err.path}: ${err.value}.`;
+  return new AppError(message, 400);
+};
 
 const sendErrorDev = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
@@ -29,7 +35,7 @@ const sendErrorProd = (err: AppError, res: Response) => {
 };
 
 export const errorHandler = (
-  err: AppError,
+  err: any,
   req: RequestCustom,
   res: Response,
   next: NextFunction
@@ -38,5 +44,9 @@ export const errorHandler = (
   err.status = err.status ?? 'error';
 
   if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
-  else sendErrorProd(err, res);
+  else {
+    let error = { ...err };
+    if (err.name === 'CastError') error = handleCastErrorDB(err);
+    sendErrorProd(error, res);
+  }
 };
