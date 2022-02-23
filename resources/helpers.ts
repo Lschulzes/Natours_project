@@ -1,3 +1,4 @@
+import { NextFunction } from 'express';
 import * as fs from 'fs';
 
 export const updateFile = (data: any, callback: any) => {
@@ -33,3 +34,8 @@ export class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export const catchAsync = (fn: any) => {
+  return (req: Request, res: Response, next: NextFunction) =>
+    fn(req, res, next).catch(next);
+};
