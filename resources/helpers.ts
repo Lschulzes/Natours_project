@@ -21,3 +21,15 @@ export type ToursType = {
 
 export const TOURS_ENDPOINT = '/api/v1/tours';
 export const USERS_ENDPOINT = '/api/v1/users';
+
+export class AppError extends Error {
+  public status: string;
+  public isOperational: boolean;
+  constructor(message: string, public statusCode: number) {
+    super(message);
+    this.status = `${statusCode}`.charAt(0) === '4' ? 'fail' : 'error';
+    this.isOperational = true;
+
+    Error.captureStackTrace(this, this.constructor);
+  }
+}

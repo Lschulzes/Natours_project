@@ -1,7 +1,15 @@
-export default class extends Error {
-  public status: string;
-  constructor(message: string, public statusCode: number) {
-    super(message);
-    this.status = statusCode.toString().charAt(0) === '4' ? 'fail' : 'error';
-  }
-}
+import { NextFunction, Response } from 'express';
+import { RequestCustom } from '../custom_types';
+import { AppError } from './../resources/helpers';
+
+export const errorHandler = (
+  err: AppError,
+  req: RequestCustom,
+  res: Response,
+  next: NextFunction
+) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+  });
+};
