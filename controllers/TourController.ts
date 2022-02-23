@@ -59,7 +59,7 @@ export const updateTour = catchAsync(
       new: true,
       runValidators: true,
     });
-    if (!tour) throw new AppError(`Tour ID (${id}) not found!`, 404);
+    if (!tour) throw new AppError(`Tour ID (${req.params.id}) not found!`, 404);
 
     res.status(200).json({
       status: 'success',
@@ -72,7 +72,7 @@ export const deleteTour = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const tour = await TourModel.findByIdAndDelete(req.params.id);
 
-    if (!tour) throw new AppError(`Tour ID (${id}) not found!`, 404);
+    if (!tour) throw new AppError(`Tour ID (${req.params.id}) not found!`, 404);
 
     res.status(204).json({
       status: 'success',
