@@ -1,10 +1,16 @@
 import { ErrorRequestHandler, NextFunction, Response } from 'express';
 import { Error } from 'mongoose';
+import { errorMonitor } from 'stream';
 import { RequestCustom } from '../custom_types';
 import { AppError } from './../resources/helpers';
 
 const handleCastErrorDB = (err: Error.CastError): AppError => {
   const message = `Invalid ${err.path}: ${err.value}.`;
+  return new AppError(message, 400);
+};
+
+const handleDuplicateFieldsDB = (err: any): AppError => {
+  const message = `Duplicated field value: ${err.keyValue.name}. Please use another value`;
   return new AppError(message, 400);
 };
 
@@ -46,7 +52,8 @@ export const errorHandler = (
   if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
   else {
     let error = { ...err };
-    if (err.name === 'CastError') error = handleCastErrorDB(err);
+    if (error.name === 'CastError') error = handleCastErrorDB(error);
+    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     sendErrorProd(error, res);
   }
 };
