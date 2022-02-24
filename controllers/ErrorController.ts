@@ -22,7 +22,7 @@ const handleMultipleMongooseErrors = (err: any): AppError => {
   } Validation Error${allErrors.length > 1 ? 's' : ''} Found:`;
 
   const message = allErrors.reduce(
-    (prev: string, el: any) => `${prev} | ${el.path}:${el.message}`,
+    (prev: string, el: any) => `${prev} | ${el.path}: ${el.message}`,
     startingMessage
   );
 
@@ -47,8 +47,6 @@ const sendErrorProd = (err: AppError, res: Response) => {
     return;
   }
 
-  console.error(`Error ${err}`);
-
   res.status(500).json({
     status: 'error',
     message: 'Something went very wrong!',
@@ -63,14 +61,12 @@ export const errorHandler = (
 ) => {
   err.statusCode = err.statusCode ?? 500;
   err.status = err.status ?? 'error';
-
   if (process.env.NODE_ENV === 'development') return sendErrorDev(err, res);
 
-  let error = { ...err };
-
-  if (error.name === 'CastError') error = handleCastErrorDB(error);
-  if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-  if (error?.errors) error = handleMultipleMongooseErrors(error);
-
+  let error;
+  if (err.name === 'CastError') error = handleCastErrorDB(err);
+  if (err.code === 11000) error = handleDuplicateFieldsDB(err);
+  if (err?.errors) error = handleMultipleMongooseErrors(err);
+  if (error === undefined) return sendErrorProd(err, res);
   sendErrorProd(error, res);
 };
