@@ -14,6 +14,15 @@ const handleDuplicateFieldsDB = (err: any): AppError => {
   return new AppError(message, 400);
 };
 
+const handleMultipleMongooseErrors = (err: any): AppError => {
+  const message = Object.values(err.errors).reduce(
+    (prev: string, el: any) => `${prev} | ${el.path}:${el.message}`,
+    'Multiple errors found:'
+  );
+
+  return new AppError(message, err.statusCode);
+};
+
 const sendErrorDev = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -49,11 +58,13 @@ export const errorHandler = (
   err.statusCode = err.statusCode ?? 500;
   err.status = err.status ?? 'error';
 
-  if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
-  else {
-    let error = { ...err };
-    if (error.name === 'CastError') error = handleCastErrorDB(error);
-    if (error.code === 11000) error = handleDuplicateFieldsDB(error);
-    sendErrorProd(error, res);
-  }
+  if (process.env.NODE_ENV === 'development') return sendErrorDev(err, res);
+
+  let error = { ...err };
+
+  if (error.name === 'CastError') error = handleCastErrorDB(error);
+  if (error.code === 11000) error = handleDuplicateFieldsDB(error);
+  if (error?.errors) error = handleMultipleMongooseErrors(error);
+
+  sendErrorProd(error, res);
 };
