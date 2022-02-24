@@ -15,9 +15,15 @@ const handleDuplicateFieldsDB = (err: any): AppError => {
 };
 
 const handleMultipleMongooseErrors = (err: any): AppError => {
-  const message = Object.values(err.errors).reduce(
+  const allErrors = Object.values(err.errors);
+
+  const startingMessage = `${
+    allErrors.length > 1 ? 'Multiple' : 'A'
+  } Validation Error${allErrors.length > 1 ? 's' : ''} Found:`;
+
+  const message = allErrors.reduce(
     (prev: string, el: any) => `${prev} | ${el.path}:${el.message}`,
-    'Multiple errors found:'
+    startingMessage
   );
 
   return new AppError(message, err.statusCode);
