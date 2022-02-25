@@ -1,13 +1,8 @@
-import { AppError } from './../resources/helpers';
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { AppError, catchAsync } from './../resources/helpers';
+import { Request, Response, NextFunction } from 'express';
 import { RequestCustom } from '../custom_types';
 import TourModel from '../models/TourModel';
 import { APIFeatures } from '../resources/apis';
-
-const catchAsync = (fn: any) => {
-  return (req: Request, res: Response, next: NextFunction) =>
-    fn(req, res, next).catch(next);
-};
 
 export const getAllTours = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

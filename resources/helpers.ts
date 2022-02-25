@@ -1,4 +1,4 @@
-import { NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 
 export const updateFile = (data: any, callback: any) => {

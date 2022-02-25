@@ -1,13 +1,30 @@
-import { ErrorRequestHandler, Request, Response } from 'express';
-import { RequestCustom } from '../custom_types';
-import { updateFile } from '../resources/helpers';
+import { catchAsync } from './../resources/helpers';
+import { Request, Response, NextFunction } from 'express';
+import UserModel from '../models/UserModel';
 
-export const getAllUsers = (req: Request, res: Response) => {};
+export const getAllUsers = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {}
+);
 
-export const getUser = (req: RequestCustom, res: Response) => {};
+export const getUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {}
+);
 
-export const updateUser = (req: Request, res: Response) => {};
+export const updateUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {}
+);
 
-export const deleteUser = (req: Request, res: Response) => {};
+export const deleteUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {}
+);
 
-export const createUser = (req: Request, res: Response) => {};
+export const createUser = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await UserModel.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: { user },
+    });
+  }
+);

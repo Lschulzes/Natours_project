@@ -1,6 +1,6 @@
 import { getTourStats, getMonthlyPlan } from './../controllers/TourController';
 import { addTop5CheapParam, checkIfHasTour } from './../middlewares/index';
-import express, { Response } from 'express';
+import express from 'express';
 import {
   getAllTours,
   createTour,
