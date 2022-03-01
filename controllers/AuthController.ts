@@ -3,6 +3,12 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import UserModel from '../models/UserModel';
 
+const signToken = (id: string) => {
+  const jwtSecret = process.env.JWT_SECRET as string;
+  const expiresIn = process.env.JWT_EXPIRES_IN as string;
+  return jwt.sign({ id }, jwtSecret, { expiresIn });
+};
+
 export const signup = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const userInfo = {
@@ -13,12 +19,8 @@ export const signup = catchAsync(
     };
 
     const user = await UserModel.create(userInfo);
-    const jwtSecret = process.env.JWT_SECRET as string;
-    const expiresIn = process.env.JWT_EXPIRES_IN as string;
 
-    const token = jwt.sign({ id: user._id }, jwtSecret, {
-      expiresIn,
-    });
+    const token = signToken(user._id);
 
     res.status(201).json({
       status: 'success',
@@ -43,26 +45,14 @@ export const login = catchAsync(
         throw new AppError('Token has expired', 400);
 
       user = await UserModel.findOne({ _id: tokenInfo.id });
+      if (!user) throw new AppError(`Invalid token`, 401);
     } else {
       user = await UserModel.findOne({ email }).select('+password');
 
-      const isPasswordCorrect = await user.isPasswordCorrect(
-        password,
-        user.password
-      );
-      if (!isPasswordCorrect)
-        throw new AppError('Entered Password does not match!', 403);
+      if (!user || !(await user.isPasswordCorrect(password, user.password)))
+        throw new AppError(`Invalid email or password`, 401);
 
-      const jwtSecret = process.env.JWT_SECRET as string;
-      const expiresIn = process.env.JWT_EXPIRES_IN as string;
-      token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn });
-    }
-
-    if (!user) {
-      throw new AppError(
-        `Could not find any user with the email of ${req.body.email}`,
-        404
-      );
+      token = signToken(user._id);
     }
 
     res.status(200).json({
