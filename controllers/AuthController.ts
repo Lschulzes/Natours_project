@@ -7,7 +7,7 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import UserModel from '../models/UserModel';
-import { JWTLoginType } from '../types';
+import { JWTLoginType, RequestCustom } from '../types';
 
 const signToken = (id: string) => {
   const jwtSecret = process.env.JWT_SECRET as string;
@@ -69,7 +69,7 @@ export const signout = catchAsync(
 );
 
 export const protect = catchAsync(
-  async (req: Request, _res: Response, next: NextFunction) => {
+  async (req: RequestCustom, _res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization;
     if (!bearer) throw new AppError('Please log in to get access', 401);
 
@@ -79,6 +79,8 @@ export const protect = catchAsync(
 
     if (user.changedPasswordAfter(iat))
       throw new AppError('Token expired, please login again!', 401);
+
+    req.user = user;
 
     next();
   }
