@@ -3,7 +3,15 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/UserModel';
 
 export const getAllUsers = catchAsync(
-  async (_req: Request, _res: Response, _next: NextFunction) => {}
+  async (_req: Request, res: Response, _next: NextFunction) => {
+    const users = await UserModel.find();
+
+    res.status(200).json({
+      status: 'success',
+      results: users.length,
+      data: { users },
+    });
+  }
 );
 
 export const getUser = catchAsync(

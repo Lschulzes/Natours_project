@@ -35,17 +35,17 @@ export const login = catchAsync(
     let user;
 
     if ((!email || !password) && !token)
-      throw new AppError('User credentials needed', 403);
+      throw new AppError('User credentials needed', 400);
 
     if (token) {
       const tokenInfo: any = jwt.decode(token);
 
       if (hasExpired(tokenInfo.exp))
-        throw new AppError('Token has expired', 403);
+        throw new AppError('Token has expired', 400);
 
       user = await UserModel.findOne({ _id: tokenInfo.id });
     } else {
-      user = await UserModel.findOne({ email });
+      user = await UserModel.findOne({ email }).select('+password');
 
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect)
