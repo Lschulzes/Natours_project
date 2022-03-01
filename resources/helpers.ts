@@ -39,3 +39,6 @@ export const catchAsync = (fn: any) => {
   return (req: Request, res: Response, next: NextFunction) =>
     fn(req, res, next).catch(next);
 };
+
+export const hasExpired = (tokenDate: number) =>
+  tokenDate > new Date().getTime();
