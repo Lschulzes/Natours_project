@@ -1,5 +1,7 @@
+import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
+import UserModel from '../models/UserModel';
 
 export const updateFile = (data: any, callback: any) => {
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, data, callback);
@@ -42,3 +44,16 @@ export const catchAsync = (fn: any) => {
 
 export const hasExpired = (tokenDate: number) =>
   tokenDate > new Date().getTime();
+
+export const getUserWithToken = async (token: string) => {
+  const tokenInfo: any = jwt.decode(token);
+
+  if (!tokenInfo?.exp)
+    throw new AppError('The token is either missing or unadequate.', 400);
+
+  if (hasExpired(tokenInfo.exp)) throw new AppError('Token has expired', 400);
+
+  const user = await UserModel.findOne({ _id: tokenInfo.id });
+  if (!user) throw new AppError(`Invalid token`, 401);
+  return user;
+};

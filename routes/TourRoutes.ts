@@ -1,3 +1,4 @@
+import { protect } from './../controllers/AuthController';
 import { getTourStats, getMonthlyPlan } from './../controllers/TourController';
 import { addTop5CheapParam, checkIfHasTour } from './../middlewares/index';
 import express from 'express';
@@ -18,7 +19,7 @@ router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 router.param('id', checkIfHasTour);
 
-router.route(`/`).get(getAllTours).post(createTour);
+router.route(`/`).get(protect, getAllTours).post(createTour);
 router.route(`/:id`).get(getTour).patch(updateTour).delete(deleteTour);
 
 export default router;

@@ -1,4 +1,4 @@
-import { catchAsync, AppError, hasExpired } from './../resources/helpers';
+import { catchAsync, AppError, getUserWithToken } from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import UserModel from '../models/UserModel';
@@ -39,13 +39,7 @@ export const login = catchAsync(
       throw new AppError('User credentials needed', 400);
 
     if (token) {
-      const tokenInfo: any = jwt.decode(token);
-
-      if (hasExpired(tokenInfo.exp))
-        throw new AppError('Token has expired', 400);
-
-      user = await UserModel.findOne({ _id: tokenInfo.id });
-      if (!user) throw new AppError(`Invalid token`, 401);
+      user = await getUserWithToken(token);
     } else {
       user = await UserModel.findOne({ email }).select('+password');
 
@@ -65,4 +59,13 @@ export const login = catchAsync(
 
 export const signout = catchAsync(
   async (_req: Request, _res: Response, _next: NextFunction) => {}
+);
+
+export const protect = catchAsync(
+  async (req: Request, _res: Response, next: NextFunction) => {
+    const { token } = req.body;
+
+    await getUserWithToken(token);
+    next();
+  }
 );
