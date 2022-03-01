@@ -4,6 +4,13 @@ import { Request, Response, NextFunction } from 'express';
 
 export const signup = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    req.body = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+    };
+
     await createUser(req, res, next);
   }
 );
