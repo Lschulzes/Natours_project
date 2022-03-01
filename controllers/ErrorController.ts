@@ -1,6 +1,5 @@
-import { ErrorRequestHandler, NextFunction, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { Error } from 'mongoose';
-import { errorMonitor } from 'stream';
 import { RequestCustom } from '../custom_types';
 import { AppError } from './../resources/helpers';
 
@@ -55,9 +54,9 @@ const sendErrorProd = (err: AppError, res: Response) => {
 
 export const errorHandler = (
   err: any,
-  req: RequestCustom,
+  _req: RequestCustom,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   err.statusCode = err.statusCode ?? 500;
   err.status = err.status ?? 'error';

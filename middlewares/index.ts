@@ -2,11 +2,11 @@ import { NextFunction, Response } from 'express';
 import { RequestCustom } from '../custom_types';
 
 export const checkIfHasTour = (
-  req: RequestCustom,
+  _req: RequestCustom,
   res: Response,
   next: NextFunction,
   id: any,
-  name: string
+  _name: string
 ) => {
   console.log(`Tour id: ${id}`);
   if (false) {
@@ -20,7 +20,7 @@ export const checkIfHasTour = (
 
 export const addTop5CheapParam = (
   req: RequestCustom,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   req.query.limit = '5';

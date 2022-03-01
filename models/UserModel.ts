@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+// import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -33,16 +34,19 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.path('password').validate(function (val: any) {
+UserSchema.path('password').validate(function (_val: any) {
   // @ts-ignore
   const thisTyped: any = this as any;
-  if (thisTyped.password && thisTyped.passwordConfirm) {
-    if (thisTyped.password === thisTyped.passwordConfirm) {
-      return;
-    }
+  if (thisTyped.password !== thisTyped.passwordConfirm) {
+    thisTyped.invalidate('passwordConfirm', 'passwords must match');
+    return;
   }
+});
 
-  thisTyped.invalidate('passwordConfirm', 'passwords must match');
+UserSchema.pre('save', function (next) {
+  if (!this.isModified('password')) return next();
+
+  next();
 });
 
 export default mongoose.model('User', UserSchema);

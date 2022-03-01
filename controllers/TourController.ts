@@ -5,7 +5,7 @@ import TourModel from '../models/TourModel';
 import { APIFeatures } from '../resources/apis';
 
 export const getAllTours = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const features = new APIFeatures(TourModel.find(), req.query)
       .filter()
       .sort()
@@ -22,7 +22,7 @@ export const getAllTours = catchAsync(
 );
 
 export const getTour = catchAsync(
-  async (req: RequestCustom, res: Response, next: NextFunction) => {
+  async (req: RequestCustom, res: Response, _next: NextFunction) => {
     const id = req.params.id;
     const tour = await TourModel.findById(id);
 
@@ -37,7 +37,7 @@ export const getTour = catchAsync(
 );
 
 export const createTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const newTour = await TourModel.create(req.body);
     res.status(201).json({
       status: 'success',
@@ -49,7 +49,7 @@ export const createTour = catchAsync(
 );
 
 export const updateTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const tour = await TourModel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -64,7 +64,7 @@ export const updateTour = catchAsync(
 );
 
 export const deleteTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const tour = await TourModel.findByIdAndDelete(req.params.id);
 
     if (!tour) throw new AppError(`Tour ID (${req.params.id}) not found!`, 404);
@@ -77,7 +77,7 @@ export const deleteTour = catchAsync(
 );
 
 export const getTourStats = catchAsync(
-  async (req: RequestCustom, res: Response, next: NextFunction) => {
+  async (_req: RequestCustom, res: Response, _next: NextFunction) => {
     const stats = await TourModel.aggregate([
       { $match: { ratingAverage: { $gte: 4 } } },
       {
@@ -102,7 +102,7 @@ export const getTourStats = catchAsync(
 );
 
 export const getMonthlyPlan = catchAsync(
-  async (req: RequestCustom, res: Response, next: NextFunction) => {
+  async (req: RequestCustom, res: Response, _next: NextFunction) => {
     const year = +req.params.year;
 
     const plan = await TourModel.aggregate([
