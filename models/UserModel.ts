@@ -36,12 +36,13 @@ const UserSchema = new mongoose.Schema({
 UserSchema.path('password').validate(function (val: any) {
   // @ts-ignore
   const thisTyped: any = this as any;
-  if (thisTyped.password && thisTyped.passwordConfirmation) {
-    if (thisTyped.password === thisTyped.passwordConfirmation) {
+  if (thisTyped.password && thisTyped.passwordConfirm) {
+    if (thisTyped.password === thisTyped.passwordConfirm) {
       return;
     }
   }
-  thisTyped.invalidate('passwordConfirmation', 'passwords must match');
+
+  thisTyped.invalidate('passwordConfirm', 'passwords must match');
 });
 
 export default mongoose.model('User', UserSchema);

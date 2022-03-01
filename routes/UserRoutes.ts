@@ -1,3 +1,4 @@
+import { signup, signout, signin } from './../controllers/AuthController';
 import express from 'express';
 import {
   getAllUsers,
@@ -8,6 +9,10 @@ import {
 } from '../controllers/UserController';
 
 const router = express.Router();
+
+router.post('/signup', signup);
+router.post('/signin', signin);
+router.post('/signout', signout);
 
 router.route(`/`).get(getAllUsers).post(createUser);
 router.route(`/:id`).get(getUser).patch(updateUser).delete(deleteUser);
