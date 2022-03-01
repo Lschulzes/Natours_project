@@ -1,4 +1,3 @@
-import bcrypt from 'bcryptjs';
 import { catchAsync, AppError, hasExpired } from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -47,7 +46,10 @@ export const login = catchAsync(
     } else {
       user = await UserModel.findOne({ email }).select('+password');
 
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      const isPasswordCorrect = await user.isPasswordCorrect(
+        password,
+        user.password
+      );
       if (!isPasswordCorrect)
         throw new AppError('Entered Password does not match!', 403);
 
