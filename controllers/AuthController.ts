@@ -1,7 +1,13 @@
-import { catchAsync, AppError, getUserWithToken } from './../resources/helpers';
+import {
+  catchAsync,
+  AppError,
+  getUserWithToken,
+  getTokenInfo,
+} from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import UserModel from '../models/UserModel';
+import { JWTLoginType } from '../types';
 
 const signToken = (id: string) => {
   const jwtSecret = process.env.JWT_SECRET as string;
@@ -16,6 +22,7 @@ export const signup = catchAsync(
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
+      passwordChangedAt: req.body.passwordChangedAt,
     };
 
     const user = await UserModel.create(userInfo);
@@ -63,9 +70,16 @@ export const signout = catchAsync(
 
 export const protect = catchAsync(
   async (req: Request, _res: Response, next: NextFunction) => {
-    const { token } = req.body;
+    const bearer = req.headers.authorization;
+    if (!bearer) throw new AppError('Please log in to get access', 401);
 
-    await getUserWithToken(token);
+    const token = bearer?.split(' ')[1];
+    const user = await getUserWithToken(token);
+    const { iat } = await getTokenInfo<JWTLoginType>(token);
+
+    if (user.changedPasswordAfter(iat))
+      throw new AppError('Token expired, please login again!', 401);
+
     next();
   }
 );

@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { Error } from 'mongoose';
-import { RequestCustom } from '../custom_types';
+import { RequestCustom } from '../types';
 import { AppError } from './../resources/helpers';
 
 const handleCastErrorDB = (err: Error.CastError): AppError => {
@@ -27,6 +27,12 @@ const handleMultipleMongooseErrors = (err: any): AppError => {
 
   return new AppError(message, err.statusCode);
 };
+
+const handleJWTError = () =>
+  new AppError('Invalid token, please login again!', 401);
+
+const handleJWTExpired = () =>
+  new AppError('Your token has expired" Please login again!', 401);
 
 const sendErrorDev = (err: AppError, res: Response) => {
   res.status(err.statusCode).json({
@@ -66,6 +72,8 @@ export const errorHandler = (
   if (err.name === 'CastError') error = handleCastErrorDB(err);
   if (err.code === 11000) error = handleDuplicateFieldsDB(err);
   if (err?.errors) error = handleMultipleMongooseErrors(err);
+  if (err.name === 'JsonWebTokenError') error = handleJWTError();
+  if (err.name === 'TokenExpiredError') error = handleJWTExpired();
   if (error === undefined) return sendErrorProd(err, res);
   sendErrorProd(error, res);
 };

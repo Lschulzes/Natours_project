@@ -1,6 +1,6 @@
 import { AppError, catchAsync } from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
-import { RequestCustom } from '../custom_types';
+import { RequestCustom } from '../types';
 import TourModel from '../models/TourModel';
 import { APIFeatures } from '../resources/apis';
 

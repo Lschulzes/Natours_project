@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import express from 'express';
-import { RequestCustom } from './custom_types';
+import { RequestCustom } from './types';
 import morgan from 'morgan';
 import { TOURS_ENDPOINT, USERS_ENDPOINT, AppError } from './resources/helpers';
 import tourRouter from './routes/TourRoutes';

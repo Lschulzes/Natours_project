@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 import UserModel from '../models/UserModel';
+import { promisify } from 'util';
+import { JWTLoginType } from '../types';
 
 export const updateFile = (data: any, callback: any) => {
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, data, callback);
@@ -45,15 +47,18 @@ export const catchAsync = (fn: any) => {
 export const hasExpired = (tokenDate: number) =>
   tokenDate > new Date().getTime();
 
+export const getTokenInfo = async <T>(token: string): Promise<T> => {
+  return (await promisify(jwt.verify)(
+    token,
+    // @ts-ignore
+    process.env.JWT_SECRET
+  )) as unknown as T;
+};
+
 export const getUserWithToken = async (token: string) => {
-  const tokenInfo: any = jwt.decode(token);
-
-  if (!tokenInfo?.exp)
-    throw new AppError('The token is either missing or unadequate.', 400);
-
-  if (hasExpired(tokenInfo.exp)) throw new AppError('Token has expired', 400);
-
+  const tokenInfo = await getTokenInfo<JWTLoginType>(token);
   const user = await UserModel.findOne({ _id: tokenInfo.id });
-  if (!user) throw new AppError(`Invalid token`, 401);
+
+  if (!user) throw new AppError(`User no longer exists!`, 401);
   return user;
 };

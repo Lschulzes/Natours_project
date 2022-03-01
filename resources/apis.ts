@@ -1,5 +1,5 @@
 import { Query as ModelQuery } from 'mongoose';
-import { Query } from '../custom_types';
+import { Query } from '../types';
 
 export class APIFeatures {
   constructor(public query: ModelQuery<any, any>, public queryString: Query) {}

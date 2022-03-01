@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { RequestCustom } from '../custom_types';
+import { RequestCustom } from '../types';
 
 export const checkIfHasTour = (
   _req: RequestCustom,

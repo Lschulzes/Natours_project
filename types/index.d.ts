@@ -6,3 +6,9 @@ interface RequestCustom extends Request {
 }
 
 interface Query extends core.Query {}
+
+export type JWTLoginType = {
+  id: string;
+  iat: number;
+  exp: number;
+};
