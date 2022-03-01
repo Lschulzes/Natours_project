@@ -23,6 +23,7 @@ export const signup = catchAsync(
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
       passwordChangedAt: req.body.passwordChangedAt,
+      role: req.body.role,
     };
 
     const user = await UserModel.create(userInfo);
@@ -85,3 +86,15 @@ export const protect = catchAsync(
     next();
   }
 );
+
+export const restrictTo = (...roles: string[]) => {
+  return (req: RequestCustom, _res: Response, next: NextFunction) => {
+    if (!roles.includes(req.user.role))
+      throw new AppError(
+        'You do not have permission to perform this action.',
+        403
+      );
+
+    next();
+  };
+};

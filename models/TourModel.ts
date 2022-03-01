@@ -19,7 +19,7 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       default: 4.5,
       min: [1, 'Rating must be above 1.0'],
-      max: [1, 'Rating must be below 5.0'],
+      max: [5, 'Rating must be below 5.0'],
     },
     ratingQuantity: {
       type: Number,
@@ -106,4 +106,4 @@ export type TourType = {
   price: number;
 };
 
-export default mongoose.model('Tour', tourSchema);
+export default mongoose.model('Tour', tourSchema, 'tours');

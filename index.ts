@@ -13,11 +13,6 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
-app.use((req: RequestCustom, _res: Response, next: NextFunction) => {
-  req.requestTime = new Date().toISOString();
-  next();
-});
-
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
 app.use(`${USERS_ENDPOINT}`, userRouter);

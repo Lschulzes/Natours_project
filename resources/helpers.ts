@@ -62,3 +62,10 @@ export const getUserWithToken = async (token: string) => {
   if (!user) throw new AppError(`User no longer exists!`, 401);
   return user;
 };
+
+export enum UserRoles {
+  ADMIN = 'admin',
+  USER = 'user',
+  GUIDE = 'guide',
+  LEAD_GUIDE = 'lead-guide',
+}

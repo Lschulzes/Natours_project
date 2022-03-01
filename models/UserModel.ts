@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
+import { UserRoles } from '../resources/helpers';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -22,6 +23,11 @@ const UserSchema = new mongoose.Schema({
     validate: [validator.isEmail, 'Please provide a valid Email'],
   },
   photo: String,
+  role: {
+    type: String,
+    enum: [UserRoles],
+    default: 'user',
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -69,4 +75,4 @@ UserSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
   return false;
 };
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema, 'users');

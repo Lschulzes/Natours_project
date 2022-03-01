@@ -1,6 +1,6 @@
-import { protect } from './../controllers/AuthController';
+import { protect, restrictTo } from './../controllers/AuthController';
 import { getTourStats, getMonthlyPlan } from './../controllers/TourController';
-import { addTop5CheapParam, checkIfHasTour } from './../middlewares/index';
+import { addTop5CheapParam } from './../middlewares/index';
 import express from 'express';
 import {
   getAllTours,
@@ -17,9 +17,11 @@ router.route('/top-5-cheap').get(addTop5CheapParam, getAllTours);
 router.route('/tour-stats').get(getTourStats);
 router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
-router.param('id', checkIfHasTour);
-
-router.route(`/`).get(protect, getAllTours).post(createTour);
-router.route(`/:id`).get(getTour).patch(updateTour).delete(deleteTour);
+router.route(`/`).get(protect, getAllTours).post(protect, createTour);
+router
+  .route(`/:id`)
+  .get(getTour)
+  .patch(protect, updateTour)
+  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 export default router;
