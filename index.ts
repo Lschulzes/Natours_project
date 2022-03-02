@@ -1,3 +1,4 @@
+import { limiter } from './middlewares/index';
 import { NextFunction, Response } from 'express';
 import express from 'express';
 import { RequestCustom } from './types';
@@ -10,6 +11,7 @@ import { errorHandler } from './controllers/ErrorController';
 const app = express();
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
+app.use('/api', limiter);
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
