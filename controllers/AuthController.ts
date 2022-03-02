@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { sendEmail } from './../resources/email';
 import {
   catchAsync,
@@ -23,7 +24,6 @@ export const signup = catchAsync(
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
-      passwordChangedAt: req.body.passwordChangedAt,
       role: req.body.role,
     };
 
@@ -107,8 +107,35 @@ export const forgotPassword = catchAsync(
   }
 );
 export const resetPassword = catchAsync(
-  async (_req: Request, _res: Response, next: NextFunction) => {
-    next();
+  async (req: Request, res: Response, _next: NextFunction) => {
+    const hashedToken = createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await UserModel.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user)
+      throw new AppError(
+        'Token invalid or expired, please issue a new one.',
+        403
+      );
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    const token = signToken(user._id);
+
+    res.status(201).json({
+      status: 'success',
+      token,
+    });
   }
 );
 
