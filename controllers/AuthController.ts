@@ -1,3 +1,4 @@
+import { sendEmail } from './../resources/email';
 import {
   catchAsync,
   AppError,
@@ -70,7 +71,7 @@ export const signout = catchAsync(
 );
 
 export const forgotPassword = catchAsync(
-  async (req: Request, _res: Response, _next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const user = await UserModel.findOne({ email: req.body.email });
     if (!user)
       throw new AppError('There is no user with that email address', 404);
@@ -78,6 +79,31 @@ export const forgotPassword = catchAsync(
 
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
+
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetPassword/${resetToken}`;
+
+    const message = `Forgot your password? Submit a PATCH request with your new password and an passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+    try {
+      await sendEmail({
+        email: user.email,
+        message,
+        subject: 'Reset Password',
+      });
+    } catch (error) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      throw new AppError(
+        'There was an error sending the email, please try again!',
+        500
+      );
+    }
+    res.status(200).json({
+      status: 'success',
+      message: 'Token sent to email!',
+    });
   }
 );
 export const resetPassword = catchAsync(
