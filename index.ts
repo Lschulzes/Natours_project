@@ -7,13 +7,22 @@ import { TOURS_ENDPOINT, USERS_ENDPOINT, AppError } from './resources/helpers';
 import tourRouter from './routes/TourRoutes';
 import userRouter from './routes/UserRoutes';
 import { errorHandler } from './controllers/ErrorController';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
 
 const app = express();
+
+app.use(helmet());
+
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 app.use('/api', limiter);
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 app.use(express.static(`${__dirname}/public`));
+
+app.use(mongoSanitize());
+app.use(xss());
 
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
