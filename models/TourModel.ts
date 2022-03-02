@@ -1,4 +1,4 @@
-import mongoose, { Aggregate } from 'mongoose';
+import mongoose, { Aggregate, Schema } from 'mongoose';
 import slugify from 'slugify';
 import UserModel from './UserModel';
 
@@ -96,7 +96,12 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: UserModel,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -111,15 +116,6 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
-  next();
-});
-
-tourSchema.pre('save', async function (next) {
-  const guides = await Promise.all(
-    this.guides.map(async (id: string) => await UserModel.findById(id))
-  );
-
-  this.guides = guides;
   next();
 });
 
