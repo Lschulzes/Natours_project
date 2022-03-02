@@ -75,3 +75,12 @@ export enum UserRoles {
   GUIDE = 'guide',
   LEAD_GUIDE = 'lead-guide',
 }
+
+export const whitelist = [
+  'duration',
+  'ratingsQuantity',
+  'ratingAverage',
+  'maxGroupSize',
+  'difficulty',
+  'price',
+];

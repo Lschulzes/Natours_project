@@ -3,13 +3,19 @@ import { NextFunction, Response } from 'express';
 import express from 'express';
 import { RequestCustom } from './types';
 import morgan from 'morgan';
-import { TOURS_ENDPOINT, USERS_ENDPOINT, AppError } from './resources/helpers';
+import {
+  TOURS_ENDPOINT,
+  USERS_ENDPOINT,
+  AppError,
+  whitelist,
+} from './resources/helpers';
 import tourRouter from './routes/TourRoutes';
 import userRouter from './routes/UserRoutes';
 import { errorHandler } from './controllers/ErrorController';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
+import hpp from 'hpp';
 
 const app = express();
 
@@ -23,6 +29,7 @@ app.use(express.static(`${__dirname}/public`));
 
 app.use(mongoSanitize());
 app.use(xss());
+app.use(hpp({ whitelist }));
 
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
