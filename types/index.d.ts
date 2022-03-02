@@ -7,6 +7,8 @@ interface RequestCustom extends Request {
 
 interface Query extends core.Query {}
 
+interface ReqBody extends ReqBody {}
+
 export type JWTLoginType = {
   id: string;
   iat: number;

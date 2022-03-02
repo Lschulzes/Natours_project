@@ -5,6 +5,7 @@ import {
   AppError,
   getUserWithToken,
   getTokenInfo,
+  filterObj,
 } from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -17,8 +18,24 @@ const signToken = (id: string) => {
   return jwt.sign({ id }, jwtSecret, { expiresIn });
 };
 
-const createSendToken = (user: any, statusCode: number, res: Response) => {
+export const createSendToken = (
+  user: any,
+  statusCode: number,
+  res: Response
+) => {
   const token = signToken(user._id);
+  const expirationInDays = +(process.env.JWT_COOKIE_EXPIRES_IN as string);
+  const cookieOptions = {
+    expires: new Date(Date.now() + expirationInDays * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: false,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+  user.passwordChangedAt = undefined;
 
   res.status(statusCode).json({
     status: 'success',
@@ -29,13 +46,14 @@ const createSendToken = (user: any, statusCode: number, res: Response) => {
 
 export const signup = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const userInfo = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      passwordConfirm: req.body.passwordConfirm,
-      role: req.body.role,
-    };
+    const userInfo = filterObj(
+      req.body,
+      'name',
+      'email',
+      'password',
+      'passwordConfirm',
+      'role'
+    );
 
     const user = await UserModel.create(userInfo);
     createSendToken(user, 201, res);
