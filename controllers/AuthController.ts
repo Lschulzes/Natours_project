@@ -17,6 +17,16 @@ const signToken = (id: string) => {
   return jwt.sign({ id }, jwtSecret, { expiresIn });
 };
 
+const createSendToken = (user: any, statusCode: number, res: Response) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: { user },
+  });
+};
+
 export const signup = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const userInfo = {
@@ -28,14 +38,7 @@ export const signup = catchAsync(
     };
 
     const user = await UserModel.create(userInfo);
-
-    const token = signToken(user._id);
-
-    res.status(201).json({
-      status: 'success',
-      token,
-      data: { user },
-    });
+    createSendToken(user, 201, res);
   }
 );
 
@@ -54,15 +57,9 @@ export const login = catchAsync(
 
       if (!user || !(await user.isPasswordCorrect(password, user.password)))
         throw new AppError(`Invalid email or password`, 401);
-
-      token = signToken(user._id);
     }
 
-    res.status(200).json({
-      status: 'success',
-      token,
-      data: { user },
-    });
+    createSendToken(user, 201, res);
   }
 );
 
@@ -75,7 +72,6 @@ export const forgotPassword = catchAsync(
     const user = await UserModel.findOne({ email: req.body.email });
     if (!user)
       throw new AppError('There is no user with that email address', 404);
-    // @ts-ignore
 
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
@@ -100,12 +96,14 @@ export const forgotPassword = catchAsync(
         500
       );
     }
+
     res.status(200).json({
       status: 'success',
       message: 'Token sent to email!',
     });
   }
 );
+
 export const resetPassword = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const hashedToken = createHash('sha256')
@@ -128,6 +126,21 @@ export const resetPassword = catchAsync(
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
 
+    await user.save();
+
+    createSendToken(user, 200, res);
+  }
+);
+
+export const updatePassword = catchAsync(
+  async (req: RequestCustom, res: Response, _next: NextFunction) => {
+    const user = await UserModel.findById(req.user.id).select('+password');
+
+    if (!user.isPasswordCorrect(req.body.password, user.password))
+      throw new AppError('Password is wrong, try again.', 401);
+
+    user.password = req.body.newPassword;
+    user.passwordConfirm = req.body.newPasswordConfirm;
     await user.save();
 
     const token = signToken(user._id);

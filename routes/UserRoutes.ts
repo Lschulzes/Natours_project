@@ -4,6 +4,8 @@ import {
   login,
   forgotPassword,
   resetPassword,
+  updatePassword,
+  protect,
 } from './../controllers/AuthController';
 import express from 'express';
 import {
@@ -21,6 +23,7 @@ router.post('/login', login);
 router.post('/signout', signout);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
+router.patch('/updatePassword', protect, updatePassword);
 
 router.route(`/`).get(getAllUsers).post(createUser);
 router.route(`/:id`).get(getUser).patch(updateUser).delete(deleteUser);
