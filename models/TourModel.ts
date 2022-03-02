@@ -102,6 +102,10 @@ const tourSchema = new mongoose.Schema(
         ref: UserModel,
       },
     ],
+    __v: {
+      type: Number,
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -121,6 +125,14 @@ tourSchema.pre('save', function (next) {
 
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-passwordChangedAt',
+  });
   next();
 });
 

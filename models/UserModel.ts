@@ -48,6 +48,10 @@ const UserSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
+  __v: {
+    type: Number,
+    select: false,
+  },
 });
 
 UserSchema.path('password').validate(function (_val: any) {
