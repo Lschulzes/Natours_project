@@ -69,6 +69,23 @@ export const signout = catchAsync(
   async (_req: Request, _res: Response, _next: NextFunction) => {}
 );
 
+export const forgotPassword = catchAsync(
+  async (req: Request, _res: Response, _next: NextFunction) => {
+    const user = await UserModel.findOne({ email: req.body.email });
+    if (!user)
+      throw new AppError('There is no user with that email address', 404);
+    // @ts-ignore
+
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+  }
+);
+export const resetPassword = catchAsync(
+  async (_req: Request, _res: Response, next: NextFunction) => {
+    next();
+  }
+);
+
 export const protect = catchAsync(
   async (req: RequestCustom, _res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization;
