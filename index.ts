@@ -6,11 +6,13 @@ import morgan from 'morgan';
 import {
   TOURS_ENDPOINT,
   USERS_ENDPOINT,
+  REVIEWS_ENDPOINT,
   AppError,
   whitelist,
 } from './resources/helpers';
 import tourRouter from './routes/TourRoutes';
 import userRouter from './routes/UserRoutes';
+import reviewsRouter from './routes/ReviewRoutes';
 import { errorHandler } from './controllers/ErrorController';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -34,6 +36,8 @@ app.use(hpp({ whitelist }));
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
 app.use(`${USERS_ENDPOINT}`, userRouter);
+
+app.use(`${REVIEWS_ENDPOINT}`, reviewsRouter);
 
 app.all('*', (req: RequestCustom, _res: Response, next: NextFunction) => {
   const err = new AppError(`Can't find ${req.originalUrl} on this server`, 404);

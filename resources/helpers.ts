@@ -26,6 +26,7 @@ export type ToursType = {
 
 export const TOURS_ENDPOINT = '/api/v1/tours';
 export const USERS_ENDPOINT = '/api/v1/users';
+export const REVIEWS_ENDPOINT = '/api/v1/reviews';
 
 export class AppError extends Error {
   public status: string;
