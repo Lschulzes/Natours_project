@@ -16,6 +16,22 @@ export const getTourReviews = catchAsync(
   }
 );
 
+export const getTourReview = catchAsync(
+  async (req: Request, res: Response, _next: NextFunction) => {
+    const { tourId } = req.params;
+    const { id } = req.params;
+
+    const reviews = await ReviewModel.find({ _id: id, tour: tourId }).populate(
+      'user'
+    );
+
+    res.status(200).json({
+      status: 'success',
+      data: { reviews },
+    });
+  }
+);
+
 export const createReview = catchAsync(
   async (req: RequestCustom, res: Response, _next: NextFunction) => {
     const reviewInfo = filterObj(req.body, 'review', 'rating');
