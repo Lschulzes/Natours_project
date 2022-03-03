@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import ReviewModel from '../models/ReviewModel';
 import { catchAsync, filterObj } from '../resources/helpers';
 import { RequestCustom } from '../types';
+import { deleteOne } from './HandlerFactory';
 
 export const getAllReviews = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
@@ -49,3 +50,5 @@ export const createReview = catchAsync(
     });
   }
 );
+
+export const deleteReview = deleteOne(ReviewModel);
