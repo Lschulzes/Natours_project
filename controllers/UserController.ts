@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/UserModel';
 import { RequestCustom } from '../types';
 import { createSendToken } from './AuthController';
+import { deleteOne, updateOne, createOne } from './HandlerFactory';
 
 export const getAllUsers = catchAsync(
   async (_req: Request, res: Response, _next: NextFunction) => {
@@ -20,24 +21,11 @@ export const getUser = catchAsync(
   async (_req: Request, _res: Response, _next: NextFunction) => {}
 );
 
-export const updateUser = catchAsync(
-  async (_req: Request, _res: Response, _next: NextFunction) => {}
-);
+export const updateUser = updateOne(UserModel);
 
-export const deleteUser = catchAsync(
-  async (_req: Request, _res: Response, _next: NextFunction) => {}
-);
+export const deleteUser = deleteOne(UserModel);
 
-export const createUser = catchAsync(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const user = await UserModel.create(req.body);
-
-    res.status(201).json({
-      status: 'success',
-      data: { user },
-    });
-  }
-);
+export const createUser = createOne(UserModel);
 
 export const updateMe = catchAsync(
   async (req: RequestCustom, res: Response, _next: NextFunction) => {

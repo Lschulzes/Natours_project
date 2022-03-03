@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RequestCustom } from '../types';
 import TourModel from '../models/TourModel';
 import { APIFeatures } from '../resources/apis';
-import { deleteOne } from './HandlerFactory';
+import { deleteOne, updateOne, createOne } from './HandlerFactory';
 
 export const getAllTours = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
@@ -36,32 +36,9 @@ export const getTour = catchAsync(
   }
 );
 
-export const createTour = catchAsync(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const newTour = await TourModel.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    });
-  }
-);
+export const createTour = createOne(TourModel);
 
-export const updateTour = catchAsync(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const tour = await TourModel.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!tour) throw new AppError(`Tour ID (${req.params.id}) not found!`, 404);
-
-    res.status(200).json({
-      status: 'success',
-      tour,
-    });
-  }
-);
+export const updateTour = updateOne(TourModel);
 
 export const deleteTour = deleteOne(TourModel);
 
