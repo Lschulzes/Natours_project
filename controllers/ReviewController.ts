@@ -5,7 +5,7 @@ import { RequestCustom } from '../types';
 
 export const getAllReviews = catchAsync(
   async (_req: Request, res: Response, _next: NextFunction) => {
-    const reviews = await ReviewModel.find();
+    const reviews = await ReviewModel.find().populate('user');
 
     res.status(200).json({
       status: 'success',

@@ -31,6 +31,10 @@ const ReviewSchema = new mongoose.Schema(
       required: [true, 'Reviews must belong to a user.'],
       immutable: true,
     },
+    __v: {
+      type: Number,
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
