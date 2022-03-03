@@ -24,9 +24,10 @@ export type ToursType = {
   longDescription: string;
 };
 
-export const TOURS_ENDPOINT = '/api/v1/tours';
-export const USERS_ENDPOINT = '/api/v1/users';
-export const REVIEWS_ENDPOINT = '/api/v1/reviews';
+const API_ENDPOINT = '/api/v1';
+export const TOURS_ENDPOINT = `${API_ENDPOINT}/tours`;
+export const USERS_ENDPOINT = `${API_ENDPOINT}/users`;
+export const REVIEWS_ENDPOINT = `${TOURS_ENDPOINT}/:tourId/reviews`;
 
 export class AppError extends Error {
   public status: string;

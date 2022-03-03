@@ -1,10 +1,13 @@
 import { protect } from './../controllers/AuthController';
-import { createReview, getAllReviews } from './../controllers/ReviewController';
+import {
+  createReview,
+  getTourReviews,
+} from './../controllers/ReviewController';
 import { Router } from 'express';
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-router.route(`/`).get(getAllReviews).post(protect, createReview);
+router.route(`/`).get(getTourReviews).post(protect, createReview);
 // router
 //   .route(`/:id`)
 //   .get(getTour)
