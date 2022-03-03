@@ -6,9 +6,9 @@ import morgan from 'morgan';
 import {
   TOURS_ENDPOINT,
   USERS_ENDPOINT,
-  REVIEWS_ENDPOINT,
   AppError,
   whitelist,
+  REVIEWS_ENDPOINT,
 } from './resources/helpers';
 import tourRouter from './routes/TourRoutes';
 import userRouter from './routes/UserRoutes';

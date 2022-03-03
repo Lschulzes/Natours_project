@@ -3,14 +3,17 @@ import ReviewModel from '../models/ReviewModel';
 import { catchAsync, filterObj } from '../resources/helpers';
 import { RequestCustom } from '../types';
 
-export const getTourReviews = catchAsync(
+export const getAllReviews = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
     const { tourId } = req.params;
+    const filter: any = {};
+    if (tourId) filter.tour = tourId;
 
-    const reviews = await ReviewModel.find({ tour: tourId }).populate('user');
+    const reviews = await ReviewModel.find(filter).populate('user');
 
     res.status(200).json({
       status: 'success',
+      results: reviews.length,
       data: { reviews },
     });
   }

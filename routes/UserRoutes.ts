@@ -18,7 +18,7 @@ import {
   deleteMe,
 } from '../controllers/UserController';
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.post('/signup', signup);
 router.post('/login', login);

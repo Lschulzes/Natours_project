@@ -9,6 +9,8 @@ import {
   updateTour,
   deleteTour,
 } from '../controllers/TourController';
+import ReviewRouter from './ReviewRoutes';
+import { TOUR_REVIEWS_ENDPOINT } from '../resources/helpers';
 
 const router = express.Router();
 
@@ -23,5 +25,7 @@ router
   .get(getTour)
   .patch(protect, updateTour)
   .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
+
+router.use(`${TOUR_REVIEWS_ENDPOINT}`, ReviewRouter);
 
 export default router;
