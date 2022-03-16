@@ -1,4 +1,4 @@
-import { protect } from './../controllers/AuthController';
+import { protect, restrictTo } from './../controllers/AuthController';
 import {
   createReview,
   deleteReview,
@@ -8,17 +8,17 @@ import {
   updateReview,
 } from './../controllers/ReviewController';
 import { Router } from 'express';
+import { UserRoles } from '../resources/helpers';
 
 const router = Router({ mergeParams: true });
 
-router
-  .route(`/`)
-  .get(getAllReviews)
-  .post(protect, setTourAndUserIds, createReview);
+router.use(protect);
+
+router.route(`/`).get(getAllReviews).post(setTourAndUserIds, createReview);
 router
   .route(`/:id`)
   .get(getTourReview)
-  .patch(updateReview)
-  .delete(protect, deleteReview);
+  .patch(restrictTo(UserRoles.USER, UserRoles.ADMIN), updateReview)
+  .delete(restrictTo(UserRoles.USER, UserRoles.ADMIN), deleteReview);
 
 export default router;

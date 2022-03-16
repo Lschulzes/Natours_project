@@ -10,21 +10,34 @@ import {
   deleteTour,
 } from '../controllers/TourController';
 import ReviewRouter from './ReviewRoutes';
-import { TOUR_REVIEWS_ENDPOINT } from '../resources/helpers';
+import { TOUR_REVIEWS_ENDPOINT, UserRoles } from '../resources/helpers';
 
 const router = express.Router();
 
 router.route('/top-5-cheap').get(addTop5CheapParam, getAllTours);
 
 router.route('/tour-stats').get(getTourStats);
-router.route('/monthly-plan/:year').get(getMonthlyPlan);
+router
+  .route('/monthly-plan/:year')
+  .get(
+    protect,
+    restrictTo(UserRoles.ADMIN, UserRoles.LEAD_GUIDE, UserRoles.GUIDE),
+    getMonthlyPlan
+  );
 
-router.route(`/`).get(protect, getAllTours).post(protect, createTour);
+router
+  .route(`/`)
+  .get(getAllTours)
+  .post(protect, restrictTo(UserRoles.ADMIN, UserRoles.LEAD_GUIDE), createTour);
 router
   .route(`/:id`)
   .get(getTour)
   .patch(protect, updateTour)
-  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
+  .delete(
+    protect,
+    restrictTo(UserRoles.ADMIN, UserRoles.LEAD_GUIDE),
+    deleteTour
+  );
 
 router.use(`${TOUR_REVIEWS_ENDPOINT}`, ReviewRouter);
 

@@ -6,6 +6,7 @@ import {
   getUserWithToken,
   getTokenInfo,
   filterObj,
+  UserRoles,
 } from './../resources/helpers';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -188,7 +189,13 @@ export const protect = catchAsync(
   }
 );
 
-export const restrictTo = (...roles: string[]) => {
+type roles =
+  | UserRoles.ADMIN
+  | UserRoles.GUIDE
+  | UserRoles.LEAD_GUIDE
+  | UserRoles.USER;
+
+export const restrictTo = (...roles: roles[]) => {
   return (req: RequestCustom, _res: Response, next: NextFunction) => {
     if (!roles.includes(req.user.role))
       throw new AppError(
