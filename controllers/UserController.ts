@@ -1,31 +1,34 @@
 import { AppError, catchAsync, filterObj } from './../resources/helpers';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import UserModel from '../models/UserModel';
 import { RequestCustom } from '../types';
 import { createSendToken } from './AuthController';
-import { deleteOne, updateOne, createOne } from './HandlerFactory';
+import {
+  deleteOne,
+  updateOne,
+  createOne,
+  getAll,
+  getOne,
+} from './HandlerFactory';
 
-export const getAllUsers = catchAsync(
-  async (_req: Request, res: Response, _next: NextFunction) => {
-    const users = await UserModel.find();
+export const getAllUsers = getAll(UserModel);
 
-    res.status(200).json({
-      status: 'success',
-      results: users.length,
-      data: { users },
-    });
-  }
-);
-
-export const getUser = catchAsync(
-  async (_req: Request, _res: Response, _next: NextFunction) => {}
-);
+export const getUser = getOne(UserModel, 'id');
 
 export const updateUser = updateOne(UserModel);
 
 export const deleteUser = deleteOne(UserModel);
 
 export const createUser = createOne(UserModel);
+
+export const getMe = (
+  req: RequestCustom,
+  _res: Response,
+  next: NextFunction
+) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 export const updateMe = catchAsync(
   async (req: RequestCustom, res: Response, _next: NextFunction) => {

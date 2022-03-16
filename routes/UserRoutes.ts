@@ -1,3 +1,4 @@
+import { getMe } from './../controllers/UserController';
 import {
   signup,
   signout,
@@ -20,6 +21,7 @@ import {
 
 const router = express.Router({ mergeParams: true });
 
+router.get('/me', protect, getMe, getUser);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/signout', signout);

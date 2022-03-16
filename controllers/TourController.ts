@@ -1,40 +1,18 @@
-import { AppError, catchAsync } from './../resources/helpers';
-import { Request, Response, NextFunction } from 'express';
+import { catchAsync } from './../resources/helpers';
+import { Response, NextFunction } from 'express';
 import { RequestCustom } from '../types';
 import TourModel from '../models/TourModel';
-import { APIFeatures } from '../resources/apis';
-import { deleteOne, updateOne, createOne } from './HandlerFactory';
+import {
+  deleteOne,
+  updateOne,
+  createOne,
+  getAll,
+  getOne,
+} from './HandlerFactory';
 
-export const getAllTours = catchAsync(
-  async (req: Request, res: Response, _next: NextFunction) => {
-    const features = new APIFeatures(TourModel.find(), req.query)
-      .filter()
-      .sort()
-      .paginate()
-      .limitFields();
+export const getAllTours = getAll(TourModel);
 
-    const tours = await features.query;
-    res.status(200).json({
-      status: 'success',
-      results: tours.length,
-      data: { tours },
-    });
-  }
-);
-
-export const getTour = catchAsync(
-  async (req: RequestCustom, res: Response, _next: NextFunction) => {
-    const id = req.params.id;
-    const tour = await TourModel.findById(id);
-
-    if (!tour) throw new AppError(`Tour ID (${id}) not found!`, 404);
-
-    res.status(200).json({
-      status: 'success',
-      data: { tour },
-    });
-  }
-);
+export const getTour = getOne(TourModel, 'id');
 
 export const createTour = createOne(TourModel);
 

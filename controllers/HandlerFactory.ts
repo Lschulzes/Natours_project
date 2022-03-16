@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Model } from 'mongoose';
+import { APIFeatures } from '../resources/apis';
 import { catchAsync, AppError } from '../resources/helpers';
 
 export const deleteOne = (Model: Model<any>) =>
@@ -20,10 +21,12 @@ export const updateOne = (Model: Model<any>) =>
       new: true,
       runValidators: true,
     });
+
     if (!document) throw new AppError(`ID (${req.params.id}) not found!`, 404);
+
     const modelName = Model.collection.collectionName;
     const data = Object.fromEntries([`${modelName}`, document]);
-    console.log(data);
+
     res.status(200).json({
       status: 'success',
       data: { data },
@@ -37,5 +40,37 @@ export const createOne = (Model: Model<any>) =>
     res.status(201).json({
       status: 'success',
       data: document,
+    });
+  });
+
+export const getAll = (Model: Model<any>, populate?: string[]) =>
+  getOneOrMore(Model, undefined, populate);
+
+export const getOne = (Model: Model<any>, idKey: string, populate?: string[]) =>
+  getOneOrMore(Model, idKey, populate);
+
+const getOneOrMore = (Model: Model<any>, idKey?: string, populate?: string[]) =>
+  catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
+    let id: string | undefined = undefined;
+    const filter: { id?: string } = {};
+    if (idKey) {
+      id = req.params[idKey];
+      if (id) filter.id = id;
+    }
+
+    const features = new APIFeatures(
+      Model.find(filter).populate(populate),
+      req.query
+    )
+      .filter()
+      .sort()
+      .paginate()
+      .limitFields();
+
+    const doc = await features.query;
+    res.status(200).json({
+      status: 'success',
+      results: doc.length,
+      data: { doc },
     });
   });

@@ -4,13 +4,17 @@ import {
   deleteReview,
   getAllReviews,
   getTourReview,
+  setTourAndUserIds,
   updateReview,
 } from './../controllers/ReviewController';
 import { Router } from 'express';
 
 const router = Router({ mergeParams: true });
 
-router.route(`/`).get(getAllReviews).post(protect, createReview);
+router
+  .route(`/`)
+  .get(getAllReviews)
+  .post(protect, setTourAndUserIds, createReview);
 router
   .route(`/:id`)
   .get(getTourReview)
