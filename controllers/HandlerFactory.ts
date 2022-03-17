@@ -43,20 +43,30 @@ export const createOne = (Model: Model<any>) =>
     });
   });
 
-export const getAll = (Model: Model<any>, populate?: string[]) =>
-  getOneOrMore(Model, undefined, populate);
+export const getAll = (
+  Model: Model<any>,
+  filters?: [objKey: string, value: string][],
+  populate?: string[]
+) => getOneOrMore(Model, filters, populate);
 
-export const getOne = (Model: Model<any>, idKey: string, populate?: string[]) =>
-  getOneOrMore(Model, idKey, populate);
+export const getOne = (
+  Model: Model<any>,
+  filters?: [objKey: string, value: string][],
+  populate?: string[]
+) => getOneOrMore(Model, filters, populate);
 
-const getOneOrMore = (Model: Model<any>, idKey?: string, populate?: string[]) =>
+const getOneOrMore = (
+  Model: Model<any>,
+  filters?: [objKey: string, value: string][],
+  populate?: string[]
+) =>
   catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
-    let id: string | undefined = undefined;
-    const filter: { _id?: string } = {};
-    if (idKey) {
-      id = req.params[idKey];
-      if (id) filter._id = id;
-    }
+    console.log(filters);
+    const filter =
+      filters?.reduce((prev, cur) => {
+        prev[cur[0]] = req.params[cur[1]];
+        return prev;
+      }, {}) ?? {};
 
     const features = new APIFeatures(
       Model.find(filter).populate(populate),

@@ -12,7 +12,7 @@ import {
 
 export const getAllTours = getAll(TourModel);
 
-export const getTour = getOne(TourModel, 'id');
+export const getTour = getOne(TourModel, [['_id', 'id']]);
 
 export const createTour = createOne(TourModel);
 

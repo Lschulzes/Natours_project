@@ -13,7 +13,7 @@ import {
 
 export const getAllUsers = getAll(UserModel);
 
-export const getUser = getOne(UserModel, 'id');
+export const getUser = getOne(UserModel, [['_id', 'id']]);
 
 export const updateUser = updateOne(UserModel);
 

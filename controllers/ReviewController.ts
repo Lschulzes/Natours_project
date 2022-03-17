@@ -20,9 +20,13 @@ export const setTourAndUserIds = (
   next();
 };
 
-export const getTourReview = getOne(ReviewModel, 'id', ['user']);
+export const getTourReview = getOne(ReviewModel, [['_id', 'id']], ['user']);
 
-export const getAllReviews = getAll(ReviewModel, ['user']);
+export const getAllReviews = getAll(
+  ReviewModel,
+  [['tour', 'tourId']],
+  ['user']
+);
 
 export const createReview = createOne(ReviewModel);
 

@@ -42,4 +42,27 @@ const ReviewSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('Review', ReviewSchema, 'reviews');
+ReviewSchema.statics.calcAverageRatings = async function (tourId: string) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRatings: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+  console.log(stats);
+};
+
+ReviewSchema.pre('save', function (next) {
+  this.constructor.calcAverageRatings(this.tour);
+  next();
+});
+
+const ReviewModel = mongoose.model('Review', ReviewSchema, 'reviews');
+
+export default ReviewModel;
