@@ -52,10 +52,10 @@ export const getOne = (Model: Model<any>, idKey: string, populate?: string[]) =>
 const getOneOrMore = (Model: Model<any>, idKey?: string, populate?: string[]) =>
   catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
     let id: string | undefined = undefined;
-    const filter: { id?: string } = {};
+    const filter: { _id?: string } = {};
     if (idKey) {
       id = req.params[idKey];
-      if (id) filter.id = id;
+      if (id) filter._id = id;
     }
 
     const features = new APIFeatures(
