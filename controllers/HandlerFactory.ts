@@ -25,7 +25,7 @@ export const updateOne = (Model: Model<any>) =>
     if (!document) throw new AppError(`ID (${req.params.id}) not found!`, 404);
 
     const modelName = Model.collection.collectionName;
-    const data = Object.fromEntries([`${modelName}`, document]);
+    const data = { [`${modelName}`]: document };
 
     res.status(200).json({
       status: 'success',
