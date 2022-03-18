@@ -55,12 +55,15 @@ ReviewSchema.statics.calcAverageRatings = async function (tourId: string) {
       },
     },
   ]);
-  console.log(stats);
+
+  await TourModel.findByIdAndUpdate(tourId, {
+    ratingQuantity: stats[0].nRatings,
+    ratingAverage: stats[0].avgRating,
+  });
 };
 
-ReviewSchema.pre('save', function (next) {
+ReviewSchema.post('save', function () {
   this.constructor.calcAverageRatings(this.tour);
-  next();
 });
 
 const ReviewModel = mongoose.model('Review', ReviewSchema, 'reviews');

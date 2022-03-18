@@ -61,7 +61,6 @@ const getOneOrMore = (
   populate?: string[]
 ) =>
   catchAsync(async (req: Request, res: Response, _next: NextFunction) => {
-    console.log(filters);
     const filter =
       filters?.reduce((prev, cur) => {
         prev[cur[0]] = req.params[cur[1]];
