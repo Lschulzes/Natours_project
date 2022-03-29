@@ -153,7 +153,11 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.pre('aggregate', function (next) {
   const thisTyped: Aggregate<any> = this as any;
+
+  if (thisTyped.pipeline()[0]?.$geoNear) return next();
+
   thisTyped.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+
   next();
 });
 

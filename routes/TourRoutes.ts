@@ -3,6 +3,7 @@ import {
   getTourStats,
   getMonthlyPlan,
   getToursWithin,
+  getDistances,
 } from './../controllers/TourController';
 import { addTop5CheapParam } from './../middlewares/index';
 import express from 'express';
@@ -32,6 +33,8 @@ router
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(getToursWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
 
 router
   .route(`/`)
