@@ -1,4 +1,4 @@
-import { catchAsync } from './../resources/helpers';
+import { catchAsync, AppError } from './../resources/helpers';
 import { Response, NextFunction } from 'express';
 import { RequestCustom } from '../types';
 import TourModel from '../models/TourModel';
@@ -20,6 +20,38 @@ export const updateTour = updateOne(TourModel);
 
 export const deleteTour = deleteOne(TourModel);
 
+export const getToursWithin = catchAsync(
+  async (req: RequestCustom, res: Response, _next: NextFunction) => {
+    const { distance, latlng, unit } = req.params;
+    const [lat, lng] = latlng.split(',');
+
+    if (isNaN(+distance)) throw new AppError('Within must be a number.', 400);
+
+    const radius = unit === 'mi' ? +distance / 3963.2 : +distance / 6378.1;
+
+    if (!lat || !lng)
+      throw new AppError(
+        'Please provide latitude and longitude in the following format: lat,lng',
+        400
+      );
+
+    const tours = await TourModel.find({
+      startLocation: {
+        $geoWithin: {
+          $centerSphere: [[lng, lat], radius],
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  }
+);
 export const getTourStats = catchAsync(
   async (_req: RequestCustom, res: Response, _next: NextFunction) => {
     const stats = await TourModel.aggregate([
@@ -38,6 +70,7 @@ export const getTourStats = catchAsync(
       },
       { $sort: { avgPrice: -1 } },
     ]);
+
     res.status(200).json({
       status: ' success',
       data: stats,

@@ -1,5 +1,9 @@
 import { protect, restrictTo } from './../controllers/AuthController';
-import { getTourStats, getMonthlyPlan } from './../controllers/TourController';
+import {
+  getTourStats,
+  getMonthlyPlan,
+  getToursWithin,
+} from './../controllers/TourController';
 import { addTop5CheapParam } from './../middlewares/index';
 import express from 'express';
 import {
@@ -24,6 +28,10 @@ router
     restrictTo(UserRoles.ADMIN, UserRoles.LEAD_GUIDE, UserRoles.GUIDE),
     getMonthlyPlan
   );
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin);
 
 router
   .route(`/`)
