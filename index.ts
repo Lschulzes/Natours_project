@@ -13,6 +13,7 @@ import {
 import tourRouter from './routes/TourRoutes';
 import userRouter from './routes/UserRoutes';
 import reviewsRouter from './routes/ReviewRoutes';
+import viewsRouter from './routes/ViewRoutes';
 import { errorHandler } from './controllers/ErrorController';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -38,18 +39,13 @@ app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp({ whitelist }));
 
-app.get('/', (_req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'Lucas',
-  });
-});
-
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
 app.use(`${USERS_ENDPOINT}`, userRouter);
 
 app.use(`${REVIEWS_ENDPOINT}`, reviewsRouter);
+
+app.use('/', viewsRouter);
 
 app.all('*', (req: RequestCustom, _res: Response, next: NextFunction) => {
   const err = new AppError(`Can't find ${req.originalUrl} on this server`, 404);
