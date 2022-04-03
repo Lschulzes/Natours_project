@@ -18,8 +18,14 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+import path from 'path';
 
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(helmet());
 
@@ -27,11 +33,17 @@ if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
 app.use('/api', limiter);
 app.use(express.json({ limit: '10kb' }));
-app.use(express.static(`${__dirname}/public`));
 
 app.use(mongoSanitize());
 app.use(xss());
 app.use(hpp({ whitelist }));
+
+app.get('/', (_req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Lucas',
+  });
+});
 
 app.use(`${TOURS_ENDPOINT}`, tourRouter);
 
