@@ -1,4 +1,48 @@
 extends base
 
-block content 
-  h1 This is the overview
+block content
+  main.main 
+    .card-container
+      each tour in tours
+        - const {slug, name, maxGroupSize, ratingQuantity, locations,  ratingAverage, price, summary, difficulty, duration, imageCover, startDates, startLocation } = tour;
+        .card
+          .card__header
+            .card__picture
+              .card__picture-overlay &nbsp;
+              img.card__picture-img(
+                src=`img/tours/${imageCover}`,
+                alt='Tour 1'
+              )
+            h3.heading-tertirary
+              span #{ name }
+
+          .card__details
+            h4.card__sub-heading #{ difficulty } #{ duration }-day tour
+            p.card__text #{ summary }
+            .card__data
+              svg.card__icon
+                use(xlink:href='img/icons.svg#icon-map-pin')
+              span #{ startLocation.description }
+            .card__data
+              svg.card__icon
+                use(xlink:href='img/icons.svg#icon-calendar')
+                - const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                - const date = new Date(startDates[0]);
+              span #{ monthNames[date.getMonth()] } #{ date.getFullYear() }
+            .card__data
+              svg.card__icon
+                use(xlink:href='img/icons.svg#icon-flag')
+              span #{ locations.length } stops
+            .card__data
+              svg.card__icon
+                use(xlink:href='img/icons.svg#icon-user')
+              span #{ maxGroupSize } people
+
+          .card__footer
+            p
+              span.card__footer-value $#{ price }
+              span.card__footer-text per person
+            p.card__ratings
+              span.card__footer-value #{ ratingAverage }
+              span.card__footer-text rating (#{ ratingQuantity })
+            a.btn.btn--green.btn--small(href=`/tours/${slug}`) Details
